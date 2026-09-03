@@ -3,6 +3,7 @@ package gr.vpapaion.motogauge;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -25,6 +26,7 @@ public class MainActivity extends Activity implements SensorEventListener, Locat
     private float zeroRoll;
     private boolean calibrated;
     private float filteredLean;
+    private final float[] baseQuaternion = new float[4];
     private boolean initialized;
 
     @Override public void onCreate(Bundle state) {
@@ -94,6 +96,9 @@ public class MainActivity extends Activity implements SensorEventListener, Locat
     @Override public void onLocationChanged(Location location) {
         try {
             float speed = location.hasSpeed() ? Math.max(0f, location.getSpeed() * 3.6f) : 0f;
+            // GPS commonly reports 0.5–2 km/h while stationary. MotoGauge is a
+            // motorcycle display, so treat values below 3 km/h as GPS drift.
+            if (speed < 3f) speed = 0f;
             if (gauge != null) gauge.setSpeed(speed, location.hasAccuracy() ? location.getAccuracy() : -1f);
         } catch (Throwable error) { showFatalError("GPS UPDATE", error); }
     }
@@ -104,16 +109,26 @@ public class MainActivity extends Activity implements SensorEventListener, Locat
 
     @Override public void onSensorChanged(SensorEvent event) {
         try {
-        float[] rotation = new float[9];
-        float[] orientation = new float[3];
-        SensorManager.getRotationMatrixFromVector(rotation, event.values);
-        SensorManager.getOrientation(rotation, orientation);
-        // Portrait phone facing the rider: motorcycle lean is rotation in the
-        // screen plane (device Z/azimuth axis). Calibration removes heading
-        // and any fixed mount offset.
-        float roll = (float) Math.toDegrees(orientation[0]);
-        if (!calibrated) { zeroRoll = roll; calibrated = true; }
-        float lean = wrapDegrees(roll - zeroRoll);
+        float x=event.values[0], y=event.values[1], z=event.values[2];
+        float w=event.values.length >= 4 ? event.values[3] :
+                (float)Math.sqrt(Math.max(0f,1f-x*x-y*y-z*z));
+        float norm=(float)Math.sqrt(x*x+y*y+z*z+w*w);
+        if (norm == 0f) return;
+        x/=norm; y/=norm; z/=norm; w/=norm;
+        if (!calibrated) {
+            baseQuaternion[0]=x; baseQuaternion[1]=y;
+            baseQuaternion[2]=z; baseQuaternion[3]=w;
+            calibrated=true; filteredLean=0f; return;
+        }
+        // Relative quaternion inverse(base) * current. Its twist around device
+        // Z is lean in the screen plane, independent of portrait/landscape.
+        float bx=baseQuaternion[0], by=baseQuaternion[1];
+        float bz=baseQuaternion[2], bw=baseQuaternion[3];
+        float relativeZ=bw*z-bx*y+by*x-bz*w;
+        float relativeW=bw*w+bx*x+by*y+bz*z;
+        if (relativeW < 0f) { relativeW=-relativeW; relativeZ=-relativeZ; }
+        float lean=(float)Math.toDegrees(2.0*Math.atan2(relativeZ,relativeW));
+        lean=wrapDegrees(lean);
         if (Math.abs(lean) < 0.5f) lean = 0f;
         filteredLean += 0.16f * (lean - filteredLean);
         gauge.setLean(filteredLean);
@@ -127,6 +142,16 @@ public class MainActivity extends Activity implements SensorEventListener, Locat
     }
 
     @Override public void onAccuracyChanged(Sensor sensor, int accuracy) { }
+
+    @Override public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Rotating the phone itself is a 90-degree Z rotation. Re-zero on the
+        // first sample after the UI changes orientation so it is not mistaken
+        // for motorcycle lean.
+        calibrated=false;
+        filteredLean=0f;
+        if (gauge != null) gauge.resetLean();
+    }
 
     private void showFatalError(String stage, Throwable error) {
         initialized = false;
