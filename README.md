@@ -1,59 +1,32 @@
-# Vaios Android Developer Demo
+# MotoGauge
 
-A compact native Android demo app designed for a GitHub portfolio. The goal is not to be a large product, but to show Android programming discipline in a small codebase that a reviewer can inspect quickly.
+Landscape motorcycle dashboard for Android with a large GPS speedometer and side-by-side left/right lean indicators.
 
-## What the app demonstrates
+## Features
 
-- Native Android `Activity` lifecycle.
-- Programmatic UI without drag-and-drop layout builders.
-- Custom drawing through `SkillRadarView`.
-- Separation into `domain`, `data`, `ai` and `ui` packages.
-- Local persistence with `SharedPreferences`.
-- Background execution with `ExecutorService` and safe UI updates through `Handler`.
-- Share intent integration.
-- GitHub Actions CI that builds an installable APK automatically.
+- GPS speed in km/h (no account, maps, or internet required)
+- Screen-aligned fused orientation from Android's rotation-vector sensor
+- Current left/right lean plus session maximums
+- One-tap upright calibration
+- High-contrast, full-screen landscape dashboard
+- Keeps the display awake while riding
 
-## Main demo idea
+> **Safety:** The lean figure is an estimate from the phone sensors. Mount flex, vibration and sensor fusion can affect it. Do not look at or operate the phone while riding.
 
-The app presents a small Android developer portfolio dashboard. It contains a local AI-style reviewer that scores the technical maturity of the demo and suggests concrete improvements such as Jetpack Compose, Room, Retrofit, WorkManager and UI tests.
+## Build
 
-The AI part is intentionally local and deterministic. It does not call an external API, so the app can run offline and can be reviewed easily.
-
-## Build locally
+Requires JDK 17, Android SDK 35 and Gradle 8.9.
 
 ```bash
-gradle --no-daemon assembleDebug
+gradle :app:assembleRelease
 ```
 
-The APK will be created here:
+The installable APK is generated at `app/build/outputs/apk/release/app-release.apk`.
 
-```text
-app/build/outputs/apk/debug/app-debug.apk
-```
+## Use
 
-## Build on GitHub
+Mount the phone securely in landscape, open MotoGauge, grant precise location access and enable GPS. Hold the motorcycle upright and tap **CALIBRATE** before riding.
 
-The repository includes `.github/workflows/android-build.yml`.
+## License
 
-After every push, GitHub Actions builds the APK and uploads it as an artifact named:
-
-```text
-Vaios-Android-Demo-debug-apk
-```
-
-To download it:
-
-1. Open the repository on GitHub.
-2. Go to **Actions**.
-3. Open the latest successful workflow run.
-4. Download the artifact **Vaios-Android-Demo-debug-apk**.
-5. Extract the zip and install the `.apk` on your Android phone.
-
-## Suggested next upgrades
-
-- Convert UI to Kotlin + Jetpack Compose.
-- Add Room database and migration tests.
-- Add Retrofit with a mock GitHub API datasource.
-- Add WorkManager for background sync.
-- Add unit tests and UI tests.
-- Add release signing and GitHub Releases.
+MIT
