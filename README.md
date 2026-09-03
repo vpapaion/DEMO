@@ -1,5 +1,9 @@
 # MotoGauge
 
+## Download
+
+[Download the latest MotoGauge APK](downloads/MotoGauge.apk)
+
 Auto-rotating motorcycle dashboard for Android with a large GPS speedometer and side-by-side left/right lean indicators.
 
 ## Features
