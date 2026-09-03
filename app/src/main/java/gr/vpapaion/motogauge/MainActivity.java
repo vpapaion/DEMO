@@ -60,7 +60,13 @@ public class MainActivity extends Activity implements SensorEventListener, Locat
 
     @Override protected void onPause() {
         sensors.unregisterListener(this);
-        locations.removeUpdates(this);
+        // Opening the runtime permission dialog pauses the Activity before the
+        // location permission has been granted. removeUpdates() is permission
+        // protected too, so calling it unconditionally crashes first launch.
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            try { locations.removeUpdates(this); }
+            catch (SecurityException ignored) { }
+        }
         super.onPause();
     }
 
