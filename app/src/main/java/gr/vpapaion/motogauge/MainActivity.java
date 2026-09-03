@@ -129,6 +129,10 @@ public class MainActivity extends Activity implements SensorEventListener, Locat
         if (relativeW < 0f) { relativeW=-relativeW; relativeZ=-relativeZ; }
         float lean=(float)Math.toDegrees(2.0*Math.atan2(relativeZ,relativeW));
         lean=wrapDegrees(lean);
+        // The visual left/right direction reverses when Android remaps the
+        // display from its natural portrait orientation to landscape.
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+            lean=-lean;
         if (Math.abs(lean) < 0.5f) lean = 0f;
         filteredLean += 0.16f * (lean - filteredLean);
         gauge.setLean(filteredLean);

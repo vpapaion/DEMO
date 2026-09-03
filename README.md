@@ -8,7 +8,7 @@ Auto-rotating motorcycle dashboard for Android with a large GPS speedometer and 
 - Screen-aligned fused orientation from Android's rotation-vector sensor
 - Current left/right lean plus session maximums
 - One-tap upright calibration
-- Automatic portrait/landscape layout and orientation-independent lean axis
+- Automatic portrait/landscape layout with correct left/right direction in both modes
 - Stationary GPS drift below 3 km/h suppressed to zero
 - Keeps the display awake while riding
 
