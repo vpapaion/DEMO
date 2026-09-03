@@ -1,37 +1,17 @@
-# MotoGauge
+# MotoSpeed
 
-## Download
-
-[Download the latest MotoGauge APK](downloads/MotoGauge.apk)
-
-Auto-rotating motorcycle dashboard for Android with a large GPS speedometer and side-by-side left/right lean indicators.
+Offline Android GPS speed dashboard for motorcycle use in portrait or landscape.
 
 ## Features
 
-- GPS speed in km/h (no account, maps, or internet required)
-- Screen-aligned fused orientation from Android's rotation-vector sensor
-- Current left/right lean plus session maximums
-- One-tap upright calibration
-- Automatic portrait/landscape layout with correct left/right direction in both modes
-- Stationary GPS drift below 3 km/h suppressed to zero
-- Keeps the display awake while riding
+- Large GPS speed display with stationary drift suppression below 3 km/h
+- Speed colours: white through 80, green 81–99, yellow 100–109, orange 110–119, red 120–129, flashing red from 130 km/h
+- Automatic 0–100 km/h timer: arms while stopped, starts when moving, and freezes at 100 km/h
+- Maximum session speed, GPS accuracy, automatic portrait/landscape layout
+- No inclination sensors, account, maps, or internet connection required
 
-> **Safety:** The lean figure is an estimate from the phone sensors. Mount flex, vibration and sensor fusion can affect it. Do not look at or operate the phone while riding.
+## Download
 
-## Build
+[Download the latest APK](downloads/MotoGauge.apk)
 
-Requires JDK 17, Android SDK 35 and Gradle 8.9.
-
-```bash
-gradle :app:assembleRelease
-```
-
-The installable APK is generated at `app/build/outputs/apk/release/app-release.apk`.
-
-## Use
-
-Mount the phone securely facing the rider in portrait or landscape, open MotoGauge, grant precise location access and enable GPS. Hold the motorcycle upright and tap **CALIBRATE UPRIGHT** before riding. If you rotate the phone, the app detects the layout change and re-zeros automatically.
-
-## License
-
-MIT
+> Use only where safe and legal. GPS updates and accuracy vary by phone and conditions. Never operate or watch the phone in a way that distracts from riding.
