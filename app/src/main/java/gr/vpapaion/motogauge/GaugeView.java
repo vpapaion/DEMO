@@ -31,7 +31,9 @@ public class GaugeView extends View {
 
     @Override protected void onDraw(Canvas c) {
         super.onDraw(c);
-        float w=getWidth(), h=getHeight(), u=Math.min(w/960f,h/480f);
+        float w=getWidth(), h=getHeight();
+        if (h >= w) { drawPortrait(c,w,h); return; }
+        float u=Math.min(w/960f,h/480f);
         p.setShader(new LinearGradient(0,0,0,h,Color.rgb(11,18,28),Color.rgb(3,6,10),Shader.TileMode.CLAMP)); c.drawRect(0,0,w,h,p); p.setShader(null);
         drawPanel(c,new RectF(22*u,24*u,280*u,h-24*u),Color.rgb(15,25,39));
         drawPanel(c,new RectF(300*u,24*u,660*u,h-24*u),Color.rgb(10,17,27));
@@ -40,6 +42,46 @@ public class GaugeView extends View {
         drawSpeed(c,480*u,h/2,u);
         drawLean(c,809*u,h/2,lean,maxRight,false,u);
         drawTop(c,w,h,u);
+    }
+
+    private void drawPortrait(Canvas c,float w,float h) {
+        float u=Math.min(w/480f,h/960f);
+        p.setShader(new LinearGradient(0,0,0,h,Color.rgb(11,18,28),Color.rgb(3,6,10),Shader.TileMode.CLAMP));
+        c.drawRect(0,0,w,h,p); p.setShader(null);
+
+        drawPanel(c,new RectF(18*u,22*u,w-18*u,470*u),Color.rgb(10,17,27));
+        text(c,"GPS SPEED",w/2,70*u,18*u,Color.rgb(120,150,172),Paint.Align.CENTER,true);
+        text(c,String.valueOf(Math.round(speed)),w/2,300*u,176*u,Color.WHITE,Paint.Align.CENTER,true);
+        text(c,"km/h",w/2,350*u,25*u,Color.rgb(87,230,255),Paint.Align.CENTER,true);
+        p.setColor(Color.rgb(29,49,68)); c.drawRoundRect(new RectF(105*u,385*u,375*u,442*u),18*u,18*u,p);
+        text(c,"MAX  "+Math.round(maxSpeed)+" km/h",w/2,422*u,20*u,Color.rgb(188,207,219),Paint.Align.CENTER,true);
+
+        float gap=10*u, top=490*u, bottom=785*u;
+        RectF leftPanel=new RectF(18*u,top,240*u-gap/2,bottom);
+        RectF rightPanel=new RectF(240*u+gap/2,top,w-18*u,bottom);
+        drawPanel(c,leftPanel,Color.rgb(15,25,39)); drawPanel(c,rightPanel,Color.rgb(15,25,39));
+        drawPortraitLean(c,leftPanel.centerX(),-lean,maxLeft,true,u);
+        drawPortraitLean(c,rightPanel.centerX(),lean,maxRight,false,u);
+
+        calibrateButton.set(90*u,810*u,w-90*u,875*u);
+        p.setColor(Color.rgb(35,49,62)); c.drawRoundRect(calibrateButton,18*u,18*u,p);
+        text(c,"CALIBRATE UPRIGHT",w/2,852*u,17*u,Color.WHITE,Paint.Align.CENTER,true);
+        int dot=gpsStatus.equals("GPS LOCK")?Color.rgb(83,224,148):Color.rgb(255,179,71);
+        p.setColor(dot); c.drawCircle(112*u,907*u,5*u,p);
+        String detail=gpsStatus+(accuracy>=0?String.format(Locale.US,"  ±%.0fm",accuracy):"");
+        text(c,detail,124*u,913*u,13*u,Color.rgb(145,167,184),Paint.Align.LEFT,true);
+        if(!sensorAvailable) text(c,"NO ROTATION SENSOR",w/2,940*u,13*u,Color.rgb(255,110,100),Paint.Align.CENTER,true);
+    }
+
+    private void drawPortraitLean(Canvas c,float x,float sideLean,float maximum,boolean left,float u) {
+        int accent=left?Color.rgb(255,179,71):Color.rgb(87,230,255);
+        text(c,left?"LEFT":"RIGHT",x,535*u,17*u,Color.rgb(120,150,172),Paint.Align.CENTER,true);
+        float shown=Math.max(0,sideLean);
+        text(c,String.format(Locale.US,"%.0f°",shown),x,655*u,66*u,shown>0.5f?accent:Color.rgb(91,110,126),Paint.Align.CENTER,true);
+        Path tri=new Path(); float dir=left?-1:1;
+        tri.moveTo(x+dir*44*u,685*u); tri.lineTo(x+dir*78*u,685*u); tri.lineTo(x+dir*78*u,651*u); tri.close();
+        p.setColor(shown>0.5f?accent:Color.rgb(50,67,82)); c.drawPath(tri,p);
+        text(c,"MAX  "+Math.round(maximum)+"°",x,746*u,18*u,Color.rgb(188,207,219),Paint.Align.CENTER,true);
     }
 
     private void drawPanel(Canvas c, RectF r, int color) { p.setColor(color); p.setStyle(Paint.Style.FILL); c.drawRoundRect(r,24,24,p); p.setStyle(Paint.Style.STROKE); p.setStrokeWidth(1.5f); p.setColor(Color.rgb(35,56,78)); c.drawRoundRect(r,24,24,p); p.setStyle(Paint.Style.FILL); }

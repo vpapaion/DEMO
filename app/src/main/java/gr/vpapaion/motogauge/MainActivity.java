@@ -105,13 +105,13 @@ public class MainActivity extends Activity implements SensorEventListener, Locat
     @Override public void onSensorChanged(SensorEvent event) {
         try {
         float[] rotation = new float[9];
-        float[] screen = new float[9];
         float[] orientation = new float[3];
         SensorManager.getRotationMatrixFromVector(rotation, event.values);
-        // Convert the phone's natural portrait coordinates to the forced landscape display.
-        SensorManager.remapCoordinateSystem(rotation, SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_X, screen);
-        SensorManager.getOrientation(screen, orientation);
-        float roll = (float) Math.toDegrees(orientation[2]);
+        SensorManager.getOrientation(rotation, orientation);
+        // Portrait phone facing the rider: motorcycle lean is rotation in the
+        // screen plane (device Z/azimuth axis). Calibration removes heading
+        // and any fixed mount offset.
+        float roll = (float) Math.toDegrees(orientation[0]);
         if (!calibrated) { zeroRoll = roll; calibrated = true; }
         float lean = wrapDegrees(roll - zeroRoll);
         if (Math.abs(lean) < 0.5f) lean = 0f;

@@ -1,6 +1,6 @@
 # MotoGauge
 
-Landscape motorcycle dashboard for Android with a large GPS speedometer and side-by-side left/right lean indicators.
+Portrait motorcycle dashboard for Android with a large GPS speedometer and side-by-side left/right lean indicators.
 
 ## Features
 
@@ -8,7 +8,7 @@ Landscape motorcycle dashboard for Android with a large GPS speedometer and side
 - Screen-aligned fused orientation from Android's rotation-vector sensor
 - Current left/right lean plus session maximums
 - One-tap upright calibration
-- High-contrast, full-screen landscape dashboard
+- High-contrast, full-screen portrait dashboard
 - Keeps the display awake while riding
 
 > **Safety:** The lean figure is an estimate from the phone sensors. Mount flex, vibration and sensor fusion can affect it. Do not look at or operate the phone while riding.
@@ -25,7 +25,7 @@ The installable APK is generated at `app/build/outputs/apk/release/app-release.a
 
 ## Use
 
-Mount the phone securely in landscape, open MotoGauge, grant precise location access and enable GPS. Hold the motorcycle upright and tap **CALIBRATE** before riding.
+Mount the phone securely in portrait facing the rider, open MotoGauge, grant precise location access and enable GPS. Hold the motorcycle upright and tap **CALIBRATE UPRIGHT** before riding.
 
 ## License
 
